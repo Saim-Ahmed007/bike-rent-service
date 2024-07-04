@@ -4,15 +4,9 @@ import express, {
   NextFunction,
   ErrorRequestHandler,
 } from 'express';
-import httpStatus from 'http-status';
 import cors from 'cors';
-
-import { UserRoutes } from './modules/user/user.route';
 import {} from 'express';
-import { academicSemesterRoutes } from './modules/academicSemester/academicSemester.route';
-import { AcademicFacultyRoutes } from './modules/academicFaculty/academicFaculty.route';
-import { AcademicDepartmentRoutes } from './modules/academicDepartment/academicDepartment.route';
-import { ZodError, ZodIssue } from 'zod';
+import { ZodError} from 'zod';
 import { TErrorSource } from './app/interface/error';
 import config from './app/config';
 import { handleZodError } from './app/errors/handleZodError';
@@ -21,14 +15,12 @@ import { handleCastError } from './app/errors/handleCastError';
 import { handleDuplicateError } from './app/errors/handleDuplicateError';
 import AppError from './app/errors/AppError';
 import notFound from './app/middlewares/not found';
-import { FacultyRoutes } from './modules/Faculty/faculty.route';
-import { AdminRoutes } from './modules/Admin/admin.route';
-import { StudentRoutes } from './modules/student/student.route';
-import { CourseRoutes } from './modules/Course/course.router';
-import { semesterRegistrationRoutes } from './modules/semesterRegistration/semesterRegistration.route';
-import { OfferedCourseRoutes } from './modules/OfferedCourse/offeredCourse.route';
-import { AuthRoutes } from './modules/Auth/auth.route';
 import cookieParser from 'cookie-parser';
+import { UserRoutes } from './modules/User/user.route';
+import { BikeRoutes } from './modules/Bike/bike.route';
+import { BookingRoutes } from './modules/Booking/booking.route';
+import { AuthRoutes } from './modules/Auth/auth.route';
+import morgan from 'morgan'
 
 const app = express();
 
@@ -37,19 +29,16 @@ app.use(cors({origin: ['http://localhost:5173']}));
 app.use(cookieParser())
 app.use(express.json());
 
-
+app.use(morgan('tiny'))
 //application routes
-app.use('/api/v1/students', StudentRoutes);
-app.use('/api/v1/faculties', FacultyRoutes);
-app.use('/api/v1/admins', AdminRoutes);
-app.use('/api/v1/users', UserRoutes);
-app.use('/api/v1/academic-semesters', academicSemesterRoutes);
-app.use('/api/v1/academic-faculties', AcademicFacultyRoutes);
-app.use('/api/v1/academic-departments', AcademicDepartmentRoutes);
-app.use('/api/v1/courses', CourseRoutes);
-app.use('/api/v1/semseter-registrations', semesterRegistrationRoutes);
-app.use('/api/v1/offered-courses', OfferedCourseRoutes);
-app.use('/api/v1/auth', AuthRoutes);
+app.use('/api', UserRoutes)
+app.use('/api/bike',BikeRoutes)
+app.use('/api/rentals', BookingRoutes)
+app.use('/api/auth',AuthRoutes)
+
+
+
+
 
 
 //global error handler
@@ -73,22 +62,26 @@ const globalErrorHandler: ErrorRequestHandler = (
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
-  } else if(error?.name === "ValidationError"){
+  }
+   else if(error?.name === "ValidationError"){
     const simplifiedError = handleValidationError(error)
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
-  } else if(error?.name === "CastError"){
+  }
+   else if(error?.name === "CastError"){
     const simplifiedError = handleCastError(error)
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
-  }else if(error?.code === 11000){
+  }
+  else if(error?.code === 11000){
     const simplifiedError = handleDuplicateError(error)
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
-  } else if(error instanceof AppError){
+  } 
+  else if(error instanceof AppError){
     statusCode = error?.statusCode
     message = error.message
     errorSources = [{

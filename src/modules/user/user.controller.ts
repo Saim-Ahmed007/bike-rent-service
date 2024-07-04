@@ -1,48 +1,44 @@
-import { UserServices } from "./user.service";
-import sendResponse from "../../app/utils/sendResponse";
 import httpStatus from "http-status";
 import catchAsync from "../../app/utils/catchAsync";
+import sendResponse from "../../app/utils/sendResponse";
+import { UserServices } from "./user.service";
 
-const createStudent = catchAsync(async (req, res, next) => {
-    
-  const {password, student: StudentData } = req.body;
-  const result = await UserServices.createStudentIntoDB(password, StudentData);
+const createUser = catchAsync(async(req,res)=>{
 
-  sendResponse(res, {
-    statusCode : httpStatus.OK,
-    success : true,
-    message : 'Student is created successfully',
-    data : result,
-  })  
+    const result = await UserServices.createUserIntoDB(req.body)
+    sendResponse(res, {
+        statusCode : httpStatus.OK,
+        success : true,
+        message : 'User registered successfully',
+        data : result,
+      })
+})
 
-}) 
+const getSingleUser = catchAsync(async(req,res)=>{
+    const {id} = req.params
+    const result = await UserServices.getSingleUserFromDB(id)
+    sendResponse(res, {
+        statusCode : httpStatus.OK,
+        success : true,
+        message : 'User profile retrieved successfully',
+        data : result,
+      })
+})
 
-const createFaculty = catchAsync(async (req, res) => {
-  const { password, faculty: facultyData } = req.body;
-
-  const result = await UserServices.createFacultyIntoDB(password, facultyData);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Faculty is created succesfully',
-    data: result,
-  });
-});
-
-const createAdmin = catchAsync(async(req,res)=>{
-  const {password, admin: adminData} = req.body;
-  const result = await UserServices.createAdminIntoDB(password, adminData)
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Admin is created succesfully',
-    data: result,
-  });
+const updateUser = catchAsync(async(req,res)=>{
+    const {id} = req.params
+    const result = await UserServices.updateUserFromDB(id, req.body)
+    sendResponse(res, {
+        statusCode : httpStatus.OK,
+        success : true,
+        message : 'Profile updated successfully',
+        data : result,
+      })
 })
 
 export const UserController = {
-    createStudent,
-    createFaculty,
-    createAdmin
+    createUser,
+    getSingleUser,
+    updateUser
 }
+
